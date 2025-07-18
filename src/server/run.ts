@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as expressWs from 'express-ws';
 import { promises as fs } from 'fs';
@@ -5,6 +6,9 @@ import { host } from './server';
 import FileSync = require('lowdb/adapters/FileSync');
 import path = require('path');
 import { Library } from './libraries';
+
+dotenv.config();
+dotenv.config({ path: ".env.defaults" });
 
 process.on('uncaughtException', (err) => console.log('uncaught exception:', err, err.stack));
 process.on('unhandledRejection', (err) => console.log('uncaught reject:', err));
@@ -25,6 +29,7 @@ async function run() {
     const libraries: Map<string, Library> = new Map();
     if (process.env.YOUTUBE_ENDPOINT) libraries.set("youtube", new Library("youtube", process.env.YOUTUBE_ENDPOINT, process.env.YOUTUBE_AUTHORIZATION));
     if (process.env.LIBRARY_ENDPOINT) libraries.set("library", new Library("library", process.env.LIBRARY_ENDPOINT));
+    if (process.env.DROPBOX_ENDPOINT) libraries.set("dropbox", new Library("dropbox", process.env.DROPBOX_ENDPOINT));
 
     const { save, sendAll } = host(xws, adapter, {
         authPassword: process.env.AUTH_PASSWORD || 'riverdale',
